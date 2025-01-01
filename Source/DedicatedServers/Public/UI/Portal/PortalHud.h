@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "PortalHud.generated.h"
 
+class USignInOverlay;
 /**
  * 
  */
@@ -14,6 +15,16 @@ class DEDICATEDSERVERS_API APortalHud : public AHUD
 {
 	GENERATED_BODY()
 	
+public:
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<USignInOverlay> SignInOverlayClass;
+
+protected:
+	virtual void BeginPlay() override;
+private:
+	UPROPERTY()
+	TObjectPtr<USignInOverlay> SignInOverlay;
 	
 	
 	

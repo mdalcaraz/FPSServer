@@ -29,8 +29,12 @@ protected:
 
 private:
 	UPROPERTY()
-	TObjectPtr<UPortalManager> PortalManageer;
+	TObjectPtr<UPortalManager> PortalManager;
 	
-	
+	UFUNCTION()
+	void OnJoinGameButtonClicked();
+
+	UFUNCTION()
+	void UpdateJoinGameStatusMessage(const FString& StatusMessage, bool bResetJoinGameButton);
 	
 };

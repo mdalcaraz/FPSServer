@@ -34,4 +34,5 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_Destination;
 	
+
 };

@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Interfaces/IHttpRequest.h"
 #include "UI/HTTP/HTTPRequestManager.h"
+#include "UI/HTTP/HTTPRequestTypes.h"
 #include "PortalManager.generated.h"
-
 /**
  * 
  */
@@ -16,6 +16,20 @@ class DEDICATEDSERVERS_API UPortalManager : public UHTTPRequestManager
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(BlueprintAssignable)
+	FAPIStatusMessage	SignUpStatusMessageDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FAPIStatusMessage	ConfirmStatusMessageDelegate;
+	
+	UPROPERTY(BlueprintAssignable)
+	FAPIStatusMessage	SignInStatusMessageDelegate;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnAPIRequestSucceeded	OnSignUpSucceeded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAPIRequestSucceeded	OnConfirmSucceeded;
 
 	void SignIn(const FString& Username, const FString& Password);
 	void SignUp(const FString& Username, const FString& Password, const FString& Email);
@@ -23,6 +37,15 @@ public:
 
 	UFUNCTION()
 	void QuitGame();
+
+	FDSSignUpResponse 	LastSignUpResponse;
+	FString LastUserName;
+
+private:
+
+	void SignUp_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void Confirm_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
 
 };

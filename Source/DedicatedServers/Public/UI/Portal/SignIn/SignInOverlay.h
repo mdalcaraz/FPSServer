@@ -48,18 +48,6 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<USuccessConfirmPage> SuccessConfirmPage;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_SignIn_Test;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_SignUp_Test;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_ConfirmSignUp_Test;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> Button_SuccessConfirm_Test;
-
 	UPROPERTY()
 	TObjectPtr<UPortalManager> PortalManager;
 	
@@ -83,4 +71,10 @@ private:
 
 	UFUNCTION()
 	void ConfirmButtonClicked();
+
+	UFUNCTION()
+	void OnSignUpSucceeded();
+	
+	UFUNCTION()
+	void OnConfirmSucceeded();
 };

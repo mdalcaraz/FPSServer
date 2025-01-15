@@ -2,14 +2,17 @@
 
 
 #include "UI/GameSessions/GameSessionsManager.h"
+
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
-#include "Interfaces/IHttpRequest.h"
-#include "Interfaces/IHttpResponse.h"
-#include "UI/HTTP/HTTPRequestTypes.h"
-#include "GameplayTags/DedicatedServersTags.h"
 #include "Data/API/APIData.h"
 #include "GameFramework/PlayerState.h"
+#include "GameplayTags/DedicatedServersTags.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+#include "Kismet/GameplayStatics.h"
+#include "UI/HTTP/HTTPRequestTypes.h"
+#include "Player/DSLocalPlayerSubsystem.h"
 
 
 void UGameSessionsManager::JoinGameSession()
@@ -23,6 +26,12 @@ void UGameSessionsManager::JoinGameSession()
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("apllication/json"));
+	UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem();
+	if (IsValid(LocalPlayerSubsystem))
+	{
+		Request->SetHeader(TEXT("Authorization"), LocalPlayerSubsystem->GetAuthResult().AccessToken);
+	}
+
 	Request->ProcessRequest();
 }
 
@@ -52,6 +61,36 @@ void UGameSessionsManager::FindOrcreateGameSession_Response(FHttpRequestPtr Requ
 
 void UGameSessionsManager::CreatePlayerSession_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
+	if (!bWasSuccessful)
+	{
+		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessages::SomethingWentWrong, true);
+	}
+
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	if (FJsonSerializer::Deserialize(JsonReader, JsonObject))
+	{
+		if (ContainsError(JsonObject))
+		{
+			BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessages::SomethingWentWrong, true);
+		}
+
+		FDSPlayerSession PlayerSession;
+		FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &PlayerSession);
+		PlayerSession.Dump();
+
+		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+		if (IsValid(LocalPlayerController))
+		{
+			FInputModeGameOnly InputModeData;
+			LocalPlayerController->SetInputMode(InputModeData);
+			LocalPlayerController->SetShowMouseCursor(false);
+		}
+
+		const FString IpAndPort = PlayerSession.IpAddress + TEXT(":") + FString::FromInt(PlayerSession.Port);
+		const FName Address(*IpAndPort);
+		UGameplayStatics::OpenLevel(this, Address);
+	}
 }
 
 FString UGameSessionsManager::GetUniquePlayerId() const

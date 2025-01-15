@@ -29,3 +29,7 @@ void UDSLocalPlayerSubsystem::SetRefreshTokenTimer()
 		World->GetTimerManager().SetTimer(RefreshTimer, RefreshDelegate, TokenRefreshInterval, false);
 	}
 }
+FDSAuthenticationResult UDSLocalPlayerSubsystem::GetAuthResult() const
+{
+	return AuthenticationResult;
+}

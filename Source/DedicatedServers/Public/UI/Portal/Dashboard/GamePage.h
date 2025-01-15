@@ -5,7 +5,8 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GamePage.generated.h"
-
+class UJoinGame;
+class UGameSessionsManager;
 /**
  * 
  */
@@ -15,6 +16,22 @@ class DEDICATEDSERVERS_API UGamePage : public UUserWidget
 	GENERATED_BODY()
 	
 	
+public:
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UJoinGame> JoingameWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameSessionsManager> GameSessionsManagerClass;
+
+protected:
+	virtual void NativeConstruct() override;
 	
-	
+private:
+
+	UFUNCTION()
+	void JoinGameButtonclicked();
+
+	UPROPERTY()
+	TObjectPtr<UGameSessionsManager> GameSessionManager;
 };

@@ -30,4 +30,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly)
 	FCountdownTimerHandle PostMatchTimer;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> LobbyMap;
+
+	void SetClientInputEnabled(bool bEnabled);
 };

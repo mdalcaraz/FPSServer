@@ -40,6 +40,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> DestinationMap;
 private:
+	
 	UPROPERTY()
 	TObjectPtr<UDS_GameInstanceSubsystems> DSGameInstanceSubsystem;
 
@@ -49,4 +50,6 @@ private:
 	void InitGameLift();
 	void SetServerParameters(FServerParameters& OutServerParameters);
 	void TryAcceptPlayerSession(const FString& PlayerSessionId, const FString& Username, FString& OutErrorMessage);
+	void AddPlayerInfoToLobbyState(AController* Player) const;
+	void RemovePlayerInfoToLobbyState(AController* Player) const;
 };

@@ -5,6 +5,7 @@
 #include "Game/DS_GameInstanceSubsystems.h"
 #include "DedicatedServers/DedicatedServers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/DSPlayerController.h"
 
 ADS_LobbyGameMode::ADS_LobbyGameMode()
 {
@@ -18,18 +19,94 @@ void ADS_LobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 	CheckAndStartLobbyCountdown();
+	UE_LOG(LogTemp, Warning, TEXT("ADS_LobbyGameMode::PostLogin for %s"), *NewPlayer->GetName());
 }
 
 void ADS_LobbyGameMode::InitSeamlessTravelPlayer(AController* NewController)
 {
 	Super::InitSeamlessTravelPlayer(NewController);
 	CheckAndStartLobbyCountdown();
+	UE_LOG(LogTemp, Warning, TEXT("ADS_LobbyGameMode::InitSeamlessTravelPlayer for %s"), *NewController->GetName());
 }
 
 void ADS_LobbyGameMode::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
 	CheckAndStopLobbyCountdown();
+	RemovePlayerSession(Exiting);
+	UE_LOG(LogTemp, Warning, TEXT("ADS_LobbyGameMode::Logout for %s"), *Exiting->GetName());
+}
+
+void ADS_LobbyGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+	FString& ErrorMessage)
+{
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+
+	const FString PlayerSessionId = UGameplayStatics::ParseOption(Options, TEXT("PlayerSessionId"));
+	const FString Username = UGameplayStatics::ParseOption(Options, TEXT("Username"));
+	TryAcceptPlayerSession(PlayerSessionId, Username, ErrorMessage);
+	UE_LOG(LogTemp, Warning, TEXT("ADS_LobbyGameMode::PreLogin - PlayerSessionId: %s, Username: %s"), *PlayerSessionId, *Username);
+}
+
+FString ADS_LobbyGameMode::InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId,
+	const FString& Options, const FString& Portal)
+{
+	FString InitializedString = Super::InitNewPlayer(NewPlayerController, UniqueId, Options, Portal);
+	const FString PlayerSessionId = UGameplayStatics::ParseOption(Options, TEXT("PlayerSessionId"));
+	const FString Username = UGameplayStatics::ParseOption(Options, TEXT("Username"));
+
+	if (ADSPlayerController* DSPlayerController = Cast<ADSPlayerController>(NewPlayerController); IsValid(DSPlayerController))
+	{
+		DSPlayerController->PlayerSessionId = PlayerSessionId;
+		DSPlayerController->Username = Username;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("ADS_LobbyGameMode::InitNewPlayer - PlayerSessionId: %s, Username: %s"), *PlayerSessionId, *Username);
+
+	return InitializedString;
+}
+
+void ADS_LobbyGameMode::TryAcceptPlayerSession(const FString& PlayerSessionId, const FString& Username,
+                                               FString& OutErrorMessage)
+{
+	if (PlayerSessionId.IsEmpty() || Username.IsEmpty())
+	{
+		OutErrorMessage = TEXT("PlayerSessionId and/or Username invalid.");
+		return;
+	}
+
+#if WITH_GAMELIFT
+	Aws::GameLift::Server::Model::DescribePlayerSessionsRequest DescribePlayerSessionsRequest;
+	DescribePlayerSessionsRequest.SetPlayerSessionId(TCHAR_TO_ANSI(*PlayerSessionId));
+	
+	const auto& DescribePlayerSessionsOutcome = Aws::GameLift::Server::DescribePlayerSessions(DescribePlayerSessionsRequest);
+	if (!DescribePlayerSessionsOutcome.IsSuccess())
+	{
+		OutErrorMessage = TEXT("DescribePlayerSessions failed");
+		return;
+	}
+
+	const auto& DescribePlayerSessionsResult = DescribePlayerSessionsOutcome.GetResult();
+	int32 Count = 0;
+	const Aws::GameLift::Server::Model::PlayerSession* PlayerSessions = DescribePlayerSessionsResult.GetPlayerSessions(Count);
+	if (PlayerSessions == nullptr || Count == 0)
+	{
+		OutErrorMessage = TEXT("GetPlayerSession failed");
+	}
+	for (int32 i = 0; i < Count; i++)
+	{
+		const Aws::GameLift::Server::Model::PlayerSession& PlayerSession = PlayerSessions[i];
+		if(!Username.Equals(PlayerSession.GetPlayerId())) continue;
+		if (PlayerSession.GetStatus() != Aws::GameLift::Server::Model::PlayerSessionStatus::RESERVED)
+		{
+			OutErrorMessage = FString::Printf(TEXT("Session for %s not RESERVED; Fail PreLogin."), *Username);
+			return;	
+		}
+		const auto& AcceptPlayerSessionOutcome = Aws::GameLift::Server::AcceptPlayerSession(TCHAR_TO_ANSI(*PlayerSessionId));
+		OutErrorMessage = AcceptPlayerSessionOutcome.IsSuccess() ? "" : FString::Printf(TEXT("Failed to accept player session for %s"), *Username);
+		
+	}
+	
+#endif
 }
 
 void ADS_LobbyGameMode::CheckAndStartLobbyCountdown()
@@ -63,6 +140,7 @@ void ADS_LobbyGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 
 	if (Type == ECountdownTimerType::LobbyCountdown)
 	{
+		StopCountdownTimer(LobbyCountdownTimer);
 		LobbyStatus = ELobbyStatus::SeamlessTravelling;
 		TrySeamlessTravel(DestinationMap);
 	}
@@ -113,3 +191,4 @@ void ADS_LobbyGameMode::SetServerParameters(FServerParameters& OutServerParamete
 	OutServerParameters.m_processId = FString::Printf(TEXT("%d"), GetCurrentProcessId());
 	UE_LOG(LogDedicatedServers, Log, TEXT("PID: %s"), *OutServerParameters.m_processId);
 }
+

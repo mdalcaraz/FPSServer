@@ -21,6 +21,8 @@ public:
 
 protected:
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
+	virtual void Logout(AController* Exiting) override;
+	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
 	
 	UPROPERTY(EditDefaultsOnly)
 	FCountdownTimerHandle PreMatchTimer;
@@ -36,3 +38,5 @@ protected:
 
 	void SetClientInputEnabled(bool bEnabled);
 };
+
+

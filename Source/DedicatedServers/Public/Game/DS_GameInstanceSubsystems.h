@@ -26,4 +26,5 @@ private:
 	FProcessParameters ProcessParams;
 	void ParseCommandLinePort(int32& OutPort);
 
+	FProcessParameters ProcessParameters;
 };

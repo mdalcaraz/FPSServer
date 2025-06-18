@@ -43,6 +43,11 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTimerStateChangeDelegate	OnTimerResumed;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString Username;
+	UPROPERTY(BlueprintReadOnly)
+	FString PlayerSessionId;
 protected:
 
 	UFUNCTION(Server, Reliable)

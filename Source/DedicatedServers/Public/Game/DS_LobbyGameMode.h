@@ -28,6 +28,8 @@ protected:
 	virtual void InitSeamlessTravelPlayer(AController* NewController) override;
 	void CheckAndStopLobbyCountdown();
 	virtual void Logout(AController* Exiting) override;
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual FString InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal = L"") override;
 	
 	UPROPERTY()
 	ELobbyStatus LobbyStatus;
@@ -46,4 +48,5 @@ private:
 	
 	void InitGameLift();
 	void SetServerParameters(FServerParameters& OutServerParameters);
+	void TryAcceptPlayerSession(const FString& PlayerSessionId, const FString& Username, FString& OutErrorMessage);
 };

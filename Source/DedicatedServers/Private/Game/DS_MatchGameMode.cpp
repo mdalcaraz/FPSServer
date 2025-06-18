@@ -30,20 +30,39 @@ void ADS_MatchGameMode::OnCountdownTimerFinished(ECountdownTimerType Type)
 
 	if (Type == ECountdownTimerType::PreMatch)
 	{
+		StopCountdownTimer(PreMatchTimer);
 		MatchStatus = EMatchStatus::Match;
 		StartCountdownTimer(MatchTimer);
 		SetClientInputEnabled(true);
 	}
 	if (Type == ECountdownTimerType::Match)
 	{
+		StopCountdownTimer(MatchTimer);
 		MatchStatus = EMatchStatus::PostMatch;
 		StartCountdownTimer(PostMatchTimer);
 		SetClientInputEnabled(false);
 	}
 	if (Type == ECountdownTimerType::PostMatch)
 	{
+		StopCountdownTimer(PostMatchTimer);
 		MatchStatus = EMatchStatus::SeamlessTravelling;
 		TrySeamlessTravel(LobbyMap);
+	}
+}
+
+void ADS_MatchGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+	RemovePlayerSession(Exiting);
+}
+void ADS_MatchGameMode::InitSeamlessTravelPlayer(AController* NewController)
+{
+	Super::InitSeamlessTravelPlayer(NewController);
+
+	if (MatchStatus == EMatchStatus::WaitingForPlayers)
+	{
+		MatchStatus = EMatchStatus::PreMatch;
+		StartCountdownTimer(PreMatchTimer);
 	}
 }
 

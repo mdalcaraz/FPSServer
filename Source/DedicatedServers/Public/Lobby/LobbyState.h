@@ -14,9 +14,9 @@ struct FLobbyPlayerInfoDelta
 
 	UPROPERTY()
 	TArray<FLobbyPlayerInfo> AddedPlayers{};
+
 	UPROPERTY()
 	TArray<FLobbyPlayerInfo> RemovedPlayers{};
-
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerInfoChanged, const FLobbyPlayerInfo&, PlayerInfo);
@@ -32,7 +32,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerInfoChanged OnPlayerInfoAdded;
-	
+
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerInfoChanged OnPlayerInfoRemoved;
 
@@ -40,17 +40,17 @@ public:
 	void RemovePlayerInfo(const FString& Username);
 	TArray<FLobbyPlayerInfo> GetPlayers() const;
 protected:
+
 	UFUNCTION()
 	void OnRep_LobbyPlayerInfo();
 	
 private:
-	
-	UPROPERTY(ReplicatedUsing = OnRep_LobbyPlayerInfo)
+
+	UPROPERTY(ReplicatedUsing=OnRep_LobbyPlayerInfo)
 	FLobbyPlayerInfoArray PlayerInfoArray;
 
 	UPROPERTY()
 	FLobbyPlayerInfoArray LastPlayerInfoArray;
 
 	FLobbyPlayerInfoDelta ComputePlayerInfoDelta(const TArray<FLobbyPlayerInfo>& OldArray, const TArray<FLobbyPlayerInfo>& NewArray);
-
 };

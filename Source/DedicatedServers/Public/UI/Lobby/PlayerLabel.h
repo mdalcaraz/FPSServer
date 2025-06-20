@@ -18,7 +18,6 @@ public:
 	void SetUsername(const FString& Username) const;
 	FString GetUsername() const;
 private:
-
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_Username;
 };

@@ -22,7 +22,8 @@ void UPortalManager::SignIn(const FString& Username, const FString& Password)
 	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::SignIn);
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("POST"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("apllication/json"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetTimeout(10.f);
 
 	LastUserName = Username;
 	TMap<FString, FString> Params = {
@@ -82,7 +83,8 @@ void UPortalManager::SignUp(const FString& Username, const FString& Password, co
 	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::SignUp);
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("POST"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("apllication/json"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetTimeout(10.f);
 
 	LastUserName = Username;
 	TMap<FString, FString> Params = {
@@ -127,7 +129,8 @@ void UPortalManager::Confirm(const FString& ConfirmationCode)
 	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::ConfirmSignUp);
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("PUT"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("apllication/json"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetTimeout(10.f);
 
 	TMap<FString, FString> Params = {
 	{TEXT("username"),	LastUserName},
@@ -189,7 +192,8 @@ void UPortalManager::RefreshTokens(const FString& RefreshToken)
 	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::SignIn);
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("POST"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("apllication/json"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetTimeout(10.f);
 
 	TMap<FString, FString> Params = {
 	{TEXT("refreshToken"),	RefreshToken}
@@ -233,7 +237,8 @@ void UPortalManager::SignOut(const FString& AccessToken)
 	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTags::PortalAPI::SignOut);
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("POST"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("apllication/json"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetTimeout(10.f);
 
 	TMap<FString, FString> Params = {
 	{TEXT("accessToken"),	AccessToken}

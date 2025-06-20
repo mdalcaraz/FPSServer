@@ -4,7 +4,6 @@
 #include "Lobby/LobbyState.h"
 #include "Net/UnrealNetwork.h"
 
-
 ALobbyState::ALobbyState()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -48,13 +47,13 @@ void ALobbyState::OnRep_LobbyPlayerInfo()
 	LastPlayerInfoArray = PlayerInfoArray;
 }
 
-FLobbyPlayerInfoDelta ALobbyState::ComputePlayerInfoDelta(const TArray<FLobbyPlayerInfo>& OldArray,
-	const TArray<FLobbyPlayerInfo>& NewArray)
+FLobbyPlayerInfoDelta ALobbyState::ComputePlayerInfoDelta(const TArray<FLobbyPlayerInfo>& OldArray, const TArray<FLobbyPlayerInfo>& NewArray)
 {
 	FLobbyPlayerInfoDelta Delta;
 
 	TMap<FString, const FLobbyPlayerInfo*> OldMap;
 	TMap<FString, const FLobbyPlayerInfo*> NewMap;
+
 	for (const auto& PlayerInfo : OldArray)
 	{
 		OldMap.Add(PlayerInfo.Username, &PlayerInfo);
@@ -70,12 +69,13 @@ FLobbyPlayerInfoDelta ALobbyState::ComputePlayerInfoDelta(const TArray<FLobbyPla
 			Delta.RemovedPlayers.Add(OldPlayerInfo);
 		}
 	}
-	for (const auto& OldPlayerInfo : NewArray)
+	for (const auto& NewPlayerInfo : NewArray)
 	{
-		if (!OldMap.Contains(OldPlayerInfo.Username))
+		if (!OldMap.Contains(NewPlayerInfo.Username))
 		{
-			Delta.AddedPlayers.Add(OldPlayerInfo);
+			Delta.AddedPlayers.Add(NewPlayerInfo);
 		}
 	}
+
 	return Delta;
 }

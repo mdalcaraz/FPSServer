@@ -38,6 +38,17 @@ struct TStructOpsTypeTraits<FLobbyPlayerInfoArray> : public TStructOpsTypeTraits
 {
 	enum
 	{
-		WithNetDeltaSerialize = true,
+		WithNetDeltaSerializer = true,
 	};
 };
+
+
+
+
+
+
+
+
+
+
+

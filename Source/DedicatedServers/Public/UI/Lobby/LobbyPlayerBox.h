@@ -6,10 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "LobbyPlayerBox.generated.h"
 
-struct FLobbyPlayerInfo;
-class ALobbyState;
-class UPlayerLabel;
 class UScrollBox;
+class UPlayerLabel;
+struct FLobbyPlayerInfo;
 /**
  * 
  */
@@ -19,18 +18,15 @@ class DEDICATEDSERVERS_API ULobbyPlayerBox : public UUserWidget
 	GENERATED_BODY()
 public:
 
-private:
-
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UScrollBox> ScrollBox_PlayerInfo;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UPlayerLabel> PlayerLabelClass;
-
 protected:
 	virtual void NativeOnInitialized() override;
 	void UpdatePlayerInfo(ALobbyState* LobbyState);
-	
+
 	UFUNCTION()
 	void OnLobbyStateInitialized(ALobbyState* LobbyState);
 
@@ -41,6 +37,7 @@ protected:
 	void OnPlayerRemoved(const FLobbyPlayerInfo& PlayerInfo);
 
 private:
-	UPlayerLabel* FindPlayerLabel(const FString& PlayerInfo);
+
+	UPlayerLabel* FindPlayerLabel(const FString& Username);
 };
 

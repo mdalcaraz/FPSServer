@@ -15,13 +15,10 @@ UCLASS()
 class DEDICATEDSERVERS_API ADS_LobbyGameMode : public ADS_GameModeBase
 {
 	GENERATED_BODY()
-
 public:
 	ADS_LobbyGameMode();
-
-	virtual void PostLogin(APlayerController* NewPlayer) override;
 	void CheckAndStartLobbyCountdown();
-
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnCountdownTimerFinished(ECountdownTimerType Type) override;
@@ -39,17 +36,18 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> DestinationMap;
-private:
 	
+private:
+
 	UPROPERTY()
 	TObjectPtr<UDS_GameInstanceSubsystems> DSGameInstanceSubsystem;
 
 	UPROPERTY(EditDefaultsOnly)
 	FCountdownTimerHandle LobbyCountdownTimer;
-	
+
 	void InitGameLift();
 	void SetServerParameters(FServerParameters& OutServerParameters);
 	void TryAcceptPlayerSession(const FString& PlayerSessionId, const FString& Username, FString& OutErrorMessage);
 	void AddPlayerInfoToLobbyState(AController* Player) const;
-	void RemovePlayerInfoToLobbyState(AController* Player) const;
+	void RemovePlayerInfoFromLobbyState(AController* Player) const;
 };

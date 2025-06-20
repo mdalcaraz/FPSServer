@@ -14,11 +14,11 @@ void ULobbyPlayerBox::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	ADSGameState* DSGameState = GetWorld()->GetGameState<ADSGameState>();
-	if (IsValid(DSGameState)) return;
+	if (!IsValid(DSGameState)) return;
 
 	if (IsValid(DSGameState->LobbyState))
 	{
-		OnLobbyStateInitialized(DSGameState->LobbyState);
+		OnLobbyStateInitialized( DSGameState->LobbyState);
 	}
 	else
 	{
@@ -38,6 +38,7 @@ void ULobbyPlayerBox::UpdatePlayerInfo(ALobbyState* LobbyState)
 void ULobbyPlayerBox::OnLobbyStateInitialized(ALobbyState* LobbyState)
 {
 	if (!IsValid(LobbyState)) return;
+
 	LobbyState->OnPlayerInfoAdded.AddDynamic(this, &ULobbyPlayerBox::CreateAndAddPlayerLabel);
 	LobbyState->OnPlayerInfoRemoved.AddDynamic(this, &ULobbyPlayerBox::OnPlayerRemoved);
 	UpdatePlayerInfo(LobbyState);
@@ -49,7 +50,7 @@ void ULobbyPlayerBox::CreateAndAddPlayerLabel(const FLobbyPlayerInfo& PlayerInfo
 	
 	UPlayerLabel* PlayerLabel = CreateWidget<UPlayerLabel>(this, PlayerLabelClass);
 	if (!IsValid(PlayerLabel)) return;
-
+	
 	PlayerLabel->SetUsername(PlayerInfo.Username);
 	ScrollBox_PlayerInfo->AddChild(PlayerLabel);
 }
@@ -62,12 +63,12 @@ void ULobbyPlayerBox::OnPlayerRemoved(const FLobbyPlayerInfo& PlayerInfo)
 	}
 }
 
-UPlayerLabel* ULobbyPlayerBox::FindPlayerLabel(const FString& UserName)
+UPlayerLabel* ULobbyPlayerBox::FindPlayerLabel(const FString& Username)
 {
 	for (UWidget* Child : ScrollBox_PlayerInfo->GetAllChildren())
 	{
 		UPlayerLabel* PlayerLabel = Cast<UPlayerLabel>(Child);
-		if (IsValid(PlayerLabel) && PlayerLabel->GetUsername() == UserName)
+		if (IsValid(PlayerLabel) && PlayerLabel->GetUsername() == Username)
 		{
 			return PlayerLabel;
 		}

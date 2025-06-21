@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/IHttpRequest.h"
 #include "UI/HTTP/HTTPRequestManager.h"
 #include "GameStatsManager.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRetrieveMatchStatsResponseReceived, const FDSRetrieveMatchStatsResponse&, RetrieveMatchStatsResponse);
 
 struct FDSRecordMatchStatsInput;
 /**
@@ -16,5 +19,16 @@ class DEDICATEDSERVERS_API UGameStatsManager : public UHTTPRequestManager
 	GENERATED_BODY()
 
 public:
-	void RecordMatchStates(const FDSRecordMatchStatsInput& RecordMatchStatsInput);
+	void RecordMatchStats(const FDSRecordMatchStatsInput& RecordMatchStatsInput);
+	void RetrieveMatchStats();
+
+	UPROPERTY(BlueprintAssignable)
+	FAPIStatusMessage RetrieveMatchStatsStatusMessage;
+
+	UPROPERTY()
+	FOnRetrieveMatchStatsResponseReceived OnRetrieveMatchStatsResponseReceived;
+private:
+	void RecordMatchStats_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void RetrieveMatchStats_Response(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
 };

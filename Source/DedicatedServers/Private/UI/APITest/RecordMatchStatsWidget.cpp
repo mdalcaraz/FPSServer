@@ -31,5 +31,5 @@ void URecordMatchStatsWidget::RecordMatchStatsButtonClicked()
 	RecordMatchStatsInput.matchStats.hits = 1;
 	RecordMatchStatsInput.matchStats.headShotElims = 5;
 
-	GameStatsManager->RecordMatchStates(RecordMatchStatsInput);
+	GameStatsManager->RecordMatchStats(RecordMatchStatsInput);
 }

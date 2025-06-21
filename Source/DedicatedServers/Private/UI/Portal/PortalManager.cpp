@@ -62,7 +62,7 @@ void UPortalManager::SignIn_Response(FHttpRequestPtr Request, FHttpResponsePtr R
 			LocalPlayerSubsystem->Username = LastUserName;
 			LocalPlayerSubsystem->Email = InitiateAuthResponse.email;
 		}
-
+		InitiateAuthResponse.Dump();
 		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
 		if (IsValid(LocalPlayerController))
 		{
@@ -157,7 +157,7 @@ void UPortalManager::Confirm_Response(FHttpRequestPtr Request, FHttpResponsePtr 
 			if (JsonObject->HasField(TEXT("name")))
 			{
 				FString Exception = JsonObject->GetStringField(TEXT("name"));
-				if (Exception.Equals(TEXT("CodeMismatchExcelption")))
+				if (Exception.Equals(TEXT("CodeMismatchException")))
 				{
 					ConfirmStatusMessageDelegate.Broadcast("Incorrect verification code.", true);
 					return;

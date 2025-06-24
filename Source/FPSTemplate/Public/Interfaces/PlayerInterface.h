@@ -67,6 +67,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void Initiate_Jump();
 
+	UFUNCTION(BlueprintNativeEvent)
+	void Initiate_SwitchCamera();
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool DoDamage(float DamageAmount, AActor* DamageInstigator);
 

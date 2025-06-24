@@ -50,8 +50,11 @@ private:
 	TObjectPtr<UInputAction> CrouchAction;
 	
 	UPROPERTY(EditAnywhere, Category="Input")
-	TObjectPtr<UInputAction> JumpAction;	
-
+	TObjectPtr<UInputAction> JumpAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> SwitchCameraAction;
+	
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> QuitAction;	
 	
@@ -59,6 +62,7 @@ private:
 	void Input_Look(const FInputActionValue& InputActionValue);
 	void Input_Crouch();
 	void Input_Jump();
+	void Input_SwitchCamera();
 	void Input_Quit();
 	bool bQuitMenuOpen;
 	

@@ -263,15 +263,21 @@ void UPortalManager::SignOut_Response(FHttpRequestPtr Request, FHttpResponsePtr 
 		{
 			return;
 		}
-
-		APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
-		if (IsValid(LocalPlayerController))
-		{
-			if (IHUDManagement* HUDManagementInterface = Cast<IHUDManagement>(LocalPlayerController->GetHUD()))
-			{
-				HUDManagementInterface->OnSignOut();
-			}
-		}
-		
 	}
+	if (UDSLocalPlayerSubsystem* LocalPlayerSubsystem = GetDSLocalPlayerSubsystem(); IsValid(LocalPlayerSubsystem))
+	{
+		LocalPlayerSubsystem->Username = "";
+		LocalPlayerSubsystem->Password = "";
+		LocalPlayerSubsystem->Email = "";
+	}
+	APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+	if (IsValid(LocalPlayerController))
+	{
+		if (IHUDManagement* HUDManagementInterface = Cast<IHUDManagement>(LocalPlayerController->GetHUD()))
+		{
+			HUDManagementInterface->OnSignOut();
+		}
+	}
+	
+
 }

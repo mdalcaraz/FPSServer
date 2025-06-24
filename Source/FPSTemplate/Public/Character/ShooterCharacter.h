@@ -68,6 +68,7 @@ public:
 	virtual void Notify_ReloadWeapon_Implementation() override;
 	virtual void Initiate_Crouch_Implementation() override;
 	virtual void Initiate_Jump_Implementation() override;
+	virtual void Initiate_SwitchCamera_Implementation() override;
 	virtual bool IsDeadOrDying_Implementation() override;
 	virtual void WeaponReplicated_Implementation() override;
 	virtual void EnableGameActions_Implementation(bool bEnable) override;
@@ -113,6 +114,7 @@ private:
 	
 	UFUNCTION()
 	void OnDeathStarted(AActor* DyingActor, AActor* DeathInstigator);
+	void CameraController();
 	
 	/** 1st person view */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
@@ -133,6 +135,12 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCamera;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCameraComponent> ThirdPersonCamera;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USpringArmComponent> ThirdPersonSpringArm;
+
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> CycleWeaponAction;
 
@@ -148,6 +156,8 @@ private:
 	FTimerHandle InitializeWidgets_Timer;
 
 	bool bEnableGameActions;
+
+	bool bIsFirstPerson;
 	
 };
 

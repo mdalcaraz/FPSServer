@@ -22,7 +22,7 @@
 AShooterCharacter::AShooterCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	bIsFirstPerson = true;
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	SpringArm->SetupAttachment(GetRootComponent());
 	SpringArm->TargetArmLength = 0.f;
@@ -34,6 +34,17 @@ AShooterCharacter::AShooterCharacter()
 	FirstPersonCamera->SetupAttachment(SpringArm);
 	FirstPersonCamera->bUsePawnControlRotation = false;
 
+	ThirdPersonSpringArm = CreateDefaultSubobject<USpringArmComponent>("ThirdPersonSpringArm");
+	ThirdPersonSpringArm->SetupAttachment(GetRootComponent());
+	ThirdPersonSpringArm->TargetArmLength = 0.f;
+	ThirdPersonSpringArm->bEnableCameraLag = true;
+	ThirdPersonSpringArm->CameraLagSpeed = 15.f;
+	ThirdPersonSpringArm->bUsePawnControlRotation = true;
+	
+	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>("ThirdPersonCamera");
+	ThirdPersonCamera->SetupAttachment(ThirdPersonSpringArm);
+	ThirdPersonCamera->bUsePawnControlRotation = false;
+
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh1P");
 	Mesh1P->SetupAttachment(FirstPersonCamera);
 	Mesh1P->bOnlyOwnerSee = true;
@@ -44,9 +55,9 @@ AShooterCharacter::AShooterCharacter()
 	Mesh1P->PrimaryComponentTick.TickGroup = TG_PrePhysics;
 
 	GetMesh()->bOnlyOwnerSee = false;
-	GetMesh()->bOwnerNoSee = true;
+	GetMesh()->bOwnerNoSee = false;
 	GetMesh()->bReceivesDecals = false;
-
+	
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
 
@@ -103,10 +114,32 @@ void AShooterCharacter::OnDeathStarted(AActor* DyingActor, AActor* DeathInstigat
 	GetMesh()->SetCollisionResponseToChannel(ECC_Weapon, ECR_Ignore);
 }
 
+void AShooterCharacter::CameraController()
+{
+	if (!IsLocallyControlled()) return;
+
+	if (bIsFirstPerson)
+	{
+		ThirdPersonCamera->Deactivate();
+		FirstPersonCamera->Activate();
+
+		Mesh1P->SetHiddenInGame(false);  
+		GetMesh()->SetHiddenInGame(true); 
+	}
+	else
+	{
+		FirstPersonCamera->Deactivate();
+		ThirdPersonCamera->Activate();
+
+		Mesh1P->SetHiddenInGame(true);    
+		GetMesh()->SetHiddenInGame(false); 
+	}
+}
+
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	CameraController();
 	if (IsValid(HealthComponent))
 	{
 		HealthComponent->OnDeathStarted.AddDynamic(this, &AShooterCharacter::OnDeathStarted);
@@ -397,6 +430,13 @@ void AShooterCharacter::Initiate_Jump_Implementation()
 	{
 		Jump();
 	}
+}
+
+void AShooterCharacter::Initiate_SwitchCamera_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Switching Camera"));
+	bIsFirstPerson = !bIsFirstPerson;
+	CameraController();
 }
 
 bool AShooterCharacter::IsDeadOrDying_Implementation()

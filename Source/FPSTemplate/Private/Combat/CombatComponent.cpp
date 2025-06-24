@@ -132,7 +132,7 @@ void UCombatComponent::OnRep_CarriedAmmo()
 }
 
 void UCombatComponent::SetCurrentWeapon(AWeapon* NewWeapon, AWeapon* LastWeapon)
-{
+ {
 	AWeapon* LocalLastWeapon = nullptr;
 
 	if (IsValid(LastWeapon))

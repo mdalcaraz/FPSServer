@@ -24,8 +24,9 @@ public:
 	void SetRefreshTokenTimer();
 	FDSAuthenticationResult GetAuthResult() const;
 
-	FString Username;
-	FString Email;
+	FString Username{};
+	FString Email{};
+	FString Password{};
 private:
 	UPROPERTY()
 	FDSAuthenticationResult	AuthenticationResult;

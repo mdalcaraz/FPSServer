@@ -12,6 +12,7 @@
 #include "UI/Portal/SignIn/SuccessConfirmPage.h"
 #include "Components/TextBlock.h"
 #include "Components/EditableTextBox.h"
+#include "Player/DSLocalPlayerSubsystem.h"
 
 void USignInOverlay::NativeConstruct()
 {
@@ -38,10 +39,29 @@ void USignInOverlay::NativeConstruct()
 	PortalManager->OnConfirmSucceeded.AddDynamic(this, &USignInOverlay::OnConfirmSucceeded);
 
 	SuccessConfirmPage->Button_Ok->OnClicked.AddDynamic(this, &USignInOverlay::ShowSignInPage);
+
+	ShowSignInPage();
+	AutoSignIn();
+}
+
+void USignInOverlay::AutoSignIn()
+{
+	if(UDSLocalPlayerSubsystem* DSLocalPlayerSubsystem = PortalManager->GetDSLocalPlayerSubsystem(); IsValid(DSLocalPlayerSubsystem))
+	{
+		const FString& Username = DSLocalPlayerSubsystem->Username;
+		const FString& Password = DSLocalPlayerSubsystem->Password;
+		if (Username.IsEmpty() || Password.IsEmpty()) return;
+
+		SignInPage->Button_SignIn->SetIsEnabled(false);
+		PortalManager->SignIn(Username, Password);
+			
+		
+	}
 }
 
 void USignInOverlay::ShowSignInPage()
 {
+	SignInPage->Button_SignIn->SetIsEnabled(true);
 	WidgetSwitcher->SetActiveWidget(SignInPage);
 }
 
@@ -64,8 +84,12 @@ void USignInOverlay::SignInButtonClicked()
 {
 	const FString Username = SignInPage->TextBox_UserName->GetText().ToString();
 	const FString Password = SignInPage->TextBox_Password->GetText().ToString();
+	if(UDSLocalPlayerSubsystem* DSLocalPlayerSubsystem = PortalManager->GetDSLocalPlayerSubsystem(); IsValid(DSLocalPlayerSubsystem))
+	{
+		DSLocalPlayerSubsystem->Password = Password;
+	}
+	
 	PortalManager->SignIn(Username, Password);
-	SignInPage->Button_SignIn->SetIsEnabled(false);
 }
 
 void USignInOverlay::SignUpButtonClicked()
@@ -74,7 +98,6 @@ void USignInOverlay::SignUpButtonClicked()
 	const FString Password = SignUpPage->TextBox_Password->GetText().ToString();
 	const FString Email = SignUpPage->TextBox_Email->GetText().ToString();
 	PortalManager->SignUp(Username, Password, Email);
-	SignUpPage->Button_SignUp->SetIsEnabled(false);
 }
 
 void USignInOverlay::ConfirmButtonClicked()

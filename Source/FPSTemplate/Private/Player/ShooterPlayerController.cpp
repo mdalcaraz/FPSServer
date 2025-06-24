@@ -65,6 +65,7 @@ void AShooterPlayerController::SetupInputComponent()
 	ShooterInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShooterPlayerController::Input_Look);
 	ShooterInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AShooterPlayerController::Input_Crouch);
 	ShooterInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AShooterPlayerController::Input_Jump);
+	ShooterInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AShooterPlayerController::Input_SwitchCamera);
 	ShooterInputComponent->BindAction(QuitAction, ETriggerEvent::Started, this, &AShooterPlayerController::Input_Quit);
 	
 }
@@ -105,6 +106,13 @@ void AShooterPlayerController::Input_Jump()
 	if (!bPawnAlive) return;
 	if (GetPawn() == nullptr || !GetPawn()->Implements<UPlayerInterface>()) return;
 	IPlayerInterface::Execute_Initiate_Jump(GetPawn());
+}
+
+void AShooterPlayerController::Input_SwitchCamera()
+{
+	if (!bPawnAlive) return;
+	if (GetPawn() == nullptr || !GetPawn()->Implements<UPlayerInterface>()) return;
+	IPlayerInterface::Execute_Initiate_SwitchCamera(GetPawn());
 }
 
 void AShooterPlayerController::Input_Quit()
